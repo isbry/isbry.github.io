@@ -1,47 +1,39 @@
-import { useState } from "react";
+import Icon from "../ui/Icon.jsx";
 
-export default function HighlightRow({ highlight, onOpen, glowColor }) {
-  const [hovered, setHovered] = useState(false);
-  const [company, role] = highlight.label.split(" - ");
-  const isClickable = !!highlight.modal;
+export default function HighlightRow({ highlight, onOpen, accent }) {
+  const { label, role, detail, modal } = highlight;
 
-  if (isClickable) {
-    return (
-      <button
-        type="button"
-        onClick={() => onOpen(highlight.modal)}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        className="w-full flex items-center justify-between gap-4 px-4 py-3 bg-slate-50 transition-all duration-200 cursor-pointer text-left rounded-2xl border"
-        style={{
-          borderColor: hovered && glowColor ? `rgba(${glowColor}, 0.5)` : "#f1f5f9",
-          backgroundColor: hovered ? `rgba(${glowColor}, 0.04)` : undefined,
-        }}
-      >
-        <div className="shrink-0">
-          <span className="text-xs font-semibold text-slate-700">{company}</span>
-          {role && <span className="text-xs text-slate-400"> - {role}</span>}
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-400 text-right">{highlight.detail}</span>
-          <span
-            className="text-sm leading-none transition-colors duration-200"
-            style={{ color: hovered && glowColor ? `rgba(${glowColor}, 0.8)` : "#cbd5e1" }}
-          >
-            ›
-          </span>
-        </div>
-      </button>
-    );
+  const content = (
+    <>
+      <span className="min-w-0 flex-1">
+        <span className="font-semibold text-[var(--ink)]">{label}</span>
+        {role && <span className="text-[var(--muted)]">, {role}</span>}
+        <span className="mt-0.5 block text-[15px] leading-snug text-[var(--muted)]">{detail}</span>
+      </span>
+      {modal && (
+        <span className="flex shrink-0 items-center gap-1 text-sm font-medium text-[var(--muted)] transition-colors group-hover:text-[var(--ink)]">
+          Details
+          <Icon name="chevron" className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+        </span>
+      )}
+    </>
+  );
+
+  if (!modal) {
+    return <li className="flex items-start gap-4 border-t border-[var(--line)] py-3.5 text-base">{content}</li>;
   }
 
   return (
-    <div className="flex items-start justify-between gap-4 px-4 py-3 bg-slate-50 rounded-2xl border border-slate-100">
-      <div className="shrink-0">
-        <span className="text-xs font-semibold text-slate-700">{company}</span>
-        {role && <span className="text-xs text-slate-400"> - {role}</span>}
-      </div>
-      <span className="text-xs text-slate-400 text-right">{highlight.detail}</span>
-    </div>
+    <li className="border-t border-[var(--line)]">
+      <button
+        type="button"
+        onClick={() => onOpen(modal)}
+        className="group -mx-3 flex w-[calc(100%+1.5rem)] items-center gap-4 rounded-lg px-3 py-3.5 text-left text-base transition-colors hover:bg-white/70"
+        style={{ "--accent": accent }}
+      >
+        <span aria-hidden="true" className="h-8 w-1 shrink-0 rounded-full bg-[var(--accent)] opacity-0 transition-opacity group-hover:opacity-100" />
+        {content}
+      </button>
+    </li>
   );
 }

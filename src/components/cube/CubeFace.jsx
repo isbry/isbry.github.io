@@ -1,40 +1,43 @@
 import Icon from "../ui/Icon.jsx";
-import { faceTransforms } from "../../data/facets.js";
+import { bricks } from "../../data/facets.js";
 
-export default function CubeFace({ facet, index, activeIndex, onSelect }) {
+// One face of the cube: a 3x3 grid of 1x1 Lego plates seen from above.
+export default function CubeFace({ facet, index, transform, active, onSelect }) {
+  const brick = bricks[facet.brick];
+
   return (
     <button
       type="button"
-      aria-label={`Show ${facet.title}`}
-      aria-pressed={activeIndex === index}
-      onClick={() => {
-        onSelect(index);
-      }}
-      className="group absolute overflow-hidden rounded-3xl border border-slate-200 bg-white/95 shadow-2xl outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-4"
+      aria-label={`Go to ${facet.title}`}
+      tabIndex={-1}
+      disabled={!onSelect}
+      onClick={() => onSelect?.(index)}
+      className="absolute inset-0 cursor-pointer rounded-[14%] bg-[#05131d] p-[4.5%] outline-none disabled:cursor-default"
       style={{
-        width: "320px",
-        height: "320px",
         backfaceVisibility: "hidden",
         WebkitBackfaceVisibility: "hidden",
-        transform: faceTransforms[index],
+        transform,
+        boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06)",
       }}
     >
-      <div className="grid h-full w-full grid-cols-3 grid-rows-3 gap-2 bg-slate-50 p-4">
-        {Array.from({ length: 9 }).map((_, tileIndex) => (
+      <span className="grid h-full w-full grid-cols-3 grid-rows-3 gap-[4%]">
+        {Array.from({ length: 9 }).map((_, tile) => (
           <span
-            key={`${facet.id}-${tileIndex}`}
-            className={`flex items-center justify-center rounded-xl border border-black/5 shadow-sm ${facet.color}`}
+            key={tile}
+            className="flex items-center justify-center rounded-[16%]"
+            style={{
+              backgroundColor: brick.hex,
+              boxShadow: "inset 0 -3px 0 rgba(0,0,0,0.16), inset 0 2px 0 rgba(255,255,255,0.28)",
+              color: brick.hex,
+            }}
           >
-            {tileIndex === 4 ? (
-              <Icon name={facet.icon} className="h-10 w-10 text-slate-950/80" />
-            ) : null}
+            {tile === 4 ? (
+              <Icon name={facet.icon} className="h-[46%] w-[46%]" style={{ color: brick.ink }} />
+            ) : (
+              <span className="stud block h-[52%] w-[52%]" />
+            )}
           </span>
         ))}
-      </div>
-      <span className="absolute bottom-3 left-3 right-3 rounded-2xl bg-white/85 px-3 py-2 text-left backdrop-blur">
-        <span className="block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-          {facet.title}
-        </span>
       </span>
     </button>
   );

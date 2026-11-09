@@ -1,94 +1,99 @@
-import { useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useRef } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import Icon from "../ui/Icon.jsx";
 
-export default function HighlightDrawer({ modal, onClose, glowColor }) {
-  const accent = glowColor ? `rgba(${glowColor}, 1)` : "#94a3b8";
-  const accentSoft = glowColor ? `rgba(${glowColor}, 0.15)` : "transparent";
+export default function HighlightDrawer({ modal, onClose, accent }) {
+  const closeRef = useRef(null);
+  const reduce = useReducedMotion();
+
   useEffect(() => {
-    if (!modal) return;
-    const handler = (e) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
+    if (!modal) return undefined;
+    const previous = document.activeElement;
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    closeRef.current?.focus();
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+      previous?.focus?.();
+    };
   }, [modal, onClose]);
 
   return (
     <AnimatePresence>
       {modal && (
         <>
-          {/* Backdrop */}
           <motion.div
             key="backdrop"
-            className="fixed inset-0 bg-black/20 z-40"
+            className="fixed inset-0 z-40 bg-[#05131d]/25 backdrop-blur-[2px]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={onClose}
           />
-
-          {/* Drawer */}
-          <motion.div
+          <motion.aside
             key="drawer"
-            className="fixed inset-y-0 right-0 w-full lg:w-[520px] z-50 bg-white shadow-2xl flex flex-col overflow-y-auto"
-            style={{ borderLeft: `2px solid ${accent}` }}
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", stiffness: 320, damping: 32, mass: 0.8 }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="drawer-title"
+            className="fixed inset-y-0 right-0 z-50 flex w-full flex-col overflow-y-auto bg-[var(--plate)] shadow-2xl sm:w-[540px]"
+            initial={reduce ? { opacity: 0 } : { x: "100%" }}
+            animate={reduce ? { opacity: 1 } : { x: 0 }}
+            exit={reduce ? { opacity: 0 } : { x: "100%" }}
+            transition={{ type: "spring", stiffness: 320, damping: 34, mass: 0.8 }}
           >
-            {/* Close button */}
-            <div className="flex justify-end p-4">
+            <div className="h-2 w-full shrink-0" style={{ backgroundColor: accent }} />
+            <div className="flex justify-end px-5 pt-4">
               <button
+                ref={closeRef}
                 type="button"
                 onClick={onClose}
-                className="text-slate-400 hover:text-slate-700 transition-colors text-xl leading-none"
+                className="rounded-full p-2 text-[var(--muted)] transition-colors hover:bg-white hover:text-[var(--ink)]"
                 aria-label="Close"
               >
-                ×
+                <Icon name="x" className="h-5 w-5" />
               </button>
             </div>
 
-            {/* Header */}
-            <div className="px-8 pt-2 pb-4">
-              <p className="text-xs uppercase tracking-widest mb-1" style={{ color: accent }}>{modal.company}</p>
-              <h2 className="text-2xl font-black text-slate-950">{modal.role}</h2>
-              <p className="text-sm text-slate-400 mt-1">{modal.period} · {modal.location}</p>
-            </div>
+            <div className="px-8 pb-12 sm:px-10">
+              <p className="text-base font-medium text-[var(--muted)]">{modal.company}</p>
+              <h2 id="drawer-title" className="mt-1 text-3xl font-bold leading-tight tracking-tight">
+                {modal.role}
+              </h2>
+              <p className="mt-2 text-[15px] text-[var(--muted)]">
+                {modal.period}
+                {modal.location ? `, ${modal.location}` : ""}
+              </p>
 
-            {/* Divider */}
-            <div className="border-t border-slate-100 mx-8" />
+              <p className="mt-8 text-lg leading-relaxed">{modal.summary}</p>
 
-            {/* Summary */}
-            <p className="px-8 py-4 text-sm text-slate-600 leading-7 italic">{modal.summary}</p>
-
-            {/* Bullets */}
-            <div className="px-8 py-2">
-              <p className="text-xs uppercase tracking-widest text-slate-300 mb-3">What I did</p>
-              <div className="flex flex-col gap-3">
-                {modal.bullets.map((bullet, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <span className="mt-1.5 shrink-0 h-1.5 w-1.5 rounded-full" style={{ backgroundColor: accent }} />
-                    <span className="text-sm text-slate-600 leading-6">{bullet}</span>
-                  </div>
+              <ul className="mt-8 space-y-4">
+                {modal.bullets.map((bullet) => (
+                  <li key={bullet} className="flex gap-3 text-base leading-relaxed text-[#26323c]">
+                    <span
+                      aria-hidden="true"
+                      className="mt-[0.55em] h-2 w-2 shrink-0 rounded-[2px]"
+                      style={{ backgroundColor: accent }}
+                    />
+                    {bullet}
+                  </li>
                 ))}
-              </div>
-            </div>
+              </ul>
 
-            {/* Stack */}
-            <div className="px-8 py-4">
-              <p className="text-xs uppercase tracking-widest text-slate-300 mb-3">Stack</p>
-              <div className="flex flex-wrap gap-2">
+              <h3 className="mt-10 text-base font-semibold">Stack</h3>
+              <ul className="mt-3 flex flex-wrap gap-2">
                 {modal.stack.map((tag) => (
-                  <span
-                    key={tag}
-                    className="text-xs border border-slate-200 rounded-full px-3 py-1 text-slate-500"
-                  >
+                  <li key={tag} className="rounded-md border border-[var(--line)] bg-white/80 px-2.5 py-1 text-sm text-[#26323c]">
                     {tag}
-                  </span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
-          </motion.div>
+          </motion.aside>
         </>
       )}
     </AnimatePresence>

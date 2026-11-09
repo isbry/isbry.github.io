@@ -1,3 +1,93 @@
+@import "@fontsource-variable/bricolage-grotesque/opsz.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --plate: #edf0f3;
+  --ink: #05131d;
+  --muted: #4b5966;
+  --line: #d3d9df;
+  color-scheme: light;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--plate);
+    color: var(--ink);
+    font-family: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* A light Lego baseplate: one stud every 28px, lit from the top left. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      radial-gradient(circle at 13px 13px, rgba(255, 255, 255, 0.75) 0 4.5px, transparent 5.5px),
+      radial-gradient(circle at 15px 15px, rgba(5, 19, 29, 0.035) 0 5px, transparent 6px);
+    background-size: 28px 28px;
+  }
+
+  ::selection {
+    background: #f2cd37;
+    color: var(--ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+/* The cube floats very slightly while it waits. */
+@keyframes cube-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.cube-float {
+  animation: cube-float 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cube-float {
+    animation: none;
+  }
+}
+
+@layer components {
+  /* A stud seen from above: flat top, lit edge top left, shaded edge bottom right. */
+  .stud {
+    border-radius: 9999px;
+    background-color: currentColor;
+    box-shadow:
+      inset 1.5px 1.5px 0 rgba(255, 255, 255, 0.38),
+      inset -1px -1px 0 rgba(0, 0, 0, 0.14),
+      1px 2px 2px rgba(0, 0, 0, 0.28);
+  }
+}

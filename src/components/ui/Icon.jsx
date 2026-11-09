@@ -1,6 +1,7 @@
-export default function Icon({ name, className = "h-6 w-6" }) {
+export default function Icon({ name, className = "h-6 w-6", style }) {
   const common = {
     className,
+    style,
     viewBox: "0 0 24 24",
     fill: "none",
     stroke: "currentColor",
@@ -107,6 +108,31 @@ export default function Icon({ name, className = "h-6 w-6" }) {
       <svg {...common}>
         <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z" />
         <circle cx="12" cy="10" r="3" />
+      </svg>
+    ),
+    pen: (
+      <svg {...common}>
+        <path d="M12 20h9" />
+        <path d="M16.4 3.6a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+      </svg>
+    ),
+    download: (
+      <svg {...common}>
+        <path d="M12 3v12" />
+        <path d="m7 10 5 5 5-5" />
+        <path d="M5 21h14" />
+      </svg>
+    ),
+    external: (
+      <svg {...common}>
+        <path d="M15 3h6v6" />
+        <path d="M10 14 21 3" />
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+      </svg>
+    ),
+    chevron: (
+      <svg {...common}>
+        <path d="m9 18 6-6-6-6" />
       </svg>
     ),
   };
