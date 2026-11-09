@@ -1,37 +1,31 @@
-import Icon from "../ui/Icon.jsx";
-
-export default function HighlightRow({ highlight, onOpen, accent }) {
+export default function HighlightRow({ highlight, onOpen }) {
   const { label, role, detail, modal } = highlight;
 
-  const content = (
-    <>
-      <span className="min-w-0 flex-1">
-        <span className="font-medium text-[var(--ink)]">{label}</span>
-        {role && <span className="text-[var(--muted)]">, {role}</span>}
-        <span className="mt-0.5 block text-[15px] leading-snug text-[var(--muted)]">{detail}</span>
-      </span>
-      {modal && (
-        <span className="flex shrink-0 items-center gap-1 text-sm font-medium text-[var(--muted)] transition-colors group-hover:text-[var(--ink)]">
-          Details
-          <Icon name="chevron" className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-        </span>
-      )}
-    </>
+  const text = (
+    <span className="min-w-0 flex-1">
+      <span className="font-bold">{label}</span>
+      {role && <span className="font-medium text-[var(--muted)]">, {role}</span>}
+      <span className="mt-0.5 block text-[15px] font-medium leading-snug text-[var(--muted)]">{detail}</span>
+    </span>
   );
 
   if (!modal) {
-    return <li className="flex items-start gap-4 border-t border-[var(--line)] py-4 text-base">{content}</li>;
+    return (
+      <li>
+        <div className="flex items-center gap-4 rounded-[14px] border-[3px] border-[#111] bg-[var(--paper)] px-4 py-3.5">{text}</div>
+      </li>
+    );
   }
 
   return (
-    <li className="border-t border-[var(--line)]">
+    <li>
       <button
         type="button"
         onClick={() => onOpen(modal)}
-        className="group -mx-3 flex w-[calc(100%+1.5rem)] items-center gap-4 rounded-xl px-3 py-4 text-left text-base transition-colors hover:bg-white"
-        style={{ "--accent": accent }}
+        className="box-sm press flex w-full items-center gap-4 bg-[var(--paper)] px-4 py-3.5 text-left"
       >
-                {content}
+        {text}
+        <span className="shrink-0 text-sm font-extrabold">Open</span>
       </button>
     </li>
   );

@@ -28,7 +28,7 @@ export default function HighlightDrawer({ modal, onClose, accent }) {
         <>
           <motion.div
             key="backdrop"
-            className="fixed inset-0 z-40 bg-[#111317]/20 backdrop-blur-[2px]"
+            className="fixed inset-0 z-40 bg-[#111]/35"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -40,43 +40,37 @@ export default function HighlightDrawer({ modal, onClose, accent }) {
             role="dialog"
             aria-modal="true"
             aria-labelledby="drawer-title"
-            className="fixed inset-y-0 right-0 z-50 flex w-full flex-col overflow-y-auto bg-[var(--canvas)] shadow-2xl sm:w-[540px]"
+            className="fixed inset-y-0 right-0 z-50 flex w-full flex-col overflow-y-auto border-l-[3px] border-[#111] bg-white sm:w-[540px]"
             initial={reduce ? { opacity: 0 } : { x: "100%" }}
             animate={reduce ? { opacity: 1 } : { x: 0 }}
             exit={reduce ? { opacity: 0 } : { x: "100%" }}
-            transition={{ type: "spring", stiffness: 320, damping: 34, mass: 0.8 }}
+            transition={{ type: "spring", stiffness: 340, damping: 34, mass: 0.8 }}
           >
-            <div className="h-1 w-full shrink-0" style={{ backgroundColor: accent }} />
-            <div className="flex justify-end px-5 pt-4">
-              <button
-                ref={closeRef}
-                type="button"
-                onClick={onClose}
-                className="rounded-full p-2 text-[var(--muted)] transition-colors hover:bg-white hover:text-[var(--ink)]"
-                aria-label="Close"
-              >
+            <div className="h-4 w-full shrink-0 border-b-[3px] border-[#111]" style={{ backgroundColor: accent }} />
+            <div className="flex justify-end px-6 pt-5">
+              <button ref={closeRef} type="button" onClick={onClose} aria-label="Close" className="box-sm press grid h-11 w-11 place-items-center bg-[#FFD43B]">
                 <Icon name="x" className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="px-8 pb-12 sm:px-10">
-              <p className="text-base font-medium text-[var(--muted)]">{modal.company}</p>
-              <h2 id="drawer-title" className="mt-1 font-serif text-[40px] leading-[1.05]">
+            <div className="px-8 pb-14 sm:px-10">
+              <p className="font-bold text-[var(--muted)]">{modal.company}</p>
+              <h2 id="drawer-title" className="mt-1 text-[38px] font-extrabold leading-none tracking-[-0.04em]">
                 {modal.role}
               </h2>
-              <p className="mt-2 text-[15px] text-[var(--muted)]">
+              <p className="mt-4 inline-block rounded-full border-2 border-[#111] px-3 py-1 text-sm font-semibold">
                 {modal.period}
                 {modal.location ? `, ${modal.location}` : ""}
               </p>
 
-              <p className="mt-8 text-[18px] leading-relaxed text-[var(--ink)]">{modal.summary}</p>
+              <p className="mt-7 text-lg font-semibold leading-relaxed">{modal.summary}</p>
 
-              <ul className="mt-8 space-y-4">
+              <ul className="mt-6 space-y-3.5">
                 {modal.bullets.map((bullet) => (
                   <li key={bullet} className="flex gap-3 text-base leading-relaxed text-[var(--body)]">
                     <span
                       aria-hidden="true"
-                      className="mt-[0.6em] h-1.5 w-1.5 shrink-0 rounded-full"
+                      className="mt-[0.35em] h-3 w-3 shrink-0 rounded-[4px] border-2 border-[#111]"
                       style={{ backgroundColor: accent }}
                     />
                     {bullet}
@@ -84,10 +78,9 @@ export default function HighlightDrawer({ modal, onClose, accent }) {
                 ))}
               </ul>
 
-              <h3 className="mt-10 text-sm font-medium text-[var(--muted)]">Stack</h3>
-              <ul className="mt-3 flex flex-wrap gap-2">
+              <ul className="mt-8 flex flex-wrap gap-2" aria-label="Stack">
                 {modal.stack.map((tag) => (
-                  <li key={tag} className="rounded-full bg-white px-3 py-1 text-[13px] text-[var(--body)] ring-1 ring-[var(--line)]">
+                  <li key={tag} className="rounded-full border-2 border-[#111] bg-white px-3 py-1 text-[13px] font-semibold">
                     {tag}
                   </li>
                 ))}

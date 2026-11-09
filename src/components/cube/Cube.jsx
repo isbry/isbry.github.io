@@ -38,13 +38,13 @@ function lightOn([nx, ny, nz], a, b) {
   return Math.max(0, x * LIGHT[0] + y * LIGHT[1] + z * LIGHT[2]);
 }
 
+// Light in three steps rather than a smooth gradient, to keep the flat look.
+const step = (light) => (light > 0.7 ? 0 : light > 0.3 ? 0.12 : 0.3);
+
 function LitFace({ facet, index, rotateX, rotateY, onSelect }) {
   const slot = SLOTS[cubeStops[index].face];
-  const shade = useTransform([rotateX, rotateY], ([a, b]) => 0.38 * Math.pow(1 - lightOn(slot.normal, a, b), 1.4));
-  const sheen = useTransform([rotateX, rotateY], ([a, b]) => Math.pow(lightOn(slot.normal, a, b), 4) * 0.6);
-  return (
-    <CubeFace facet={facet} index={index} transform={slot.transform} shade={shade} sheen={sheen} onSelect={onSelect} />
-  );
+  const shade = useTransform([rotateX, rotateY], ([a, b]) => step(lightOn(slot.normal, a, b)));
+  return <CubeFace facet={facet} index={index} transform={slot.transform} shade={shade} onSelect={onSelect} />;
 }
 
 // rotateX and rotateY are motion values owned by the page, so the cube can
@@ -63,12 +63,11 @@ export default function Cube({ rotateX, rotateY, onSelectFace, sizeClass, shadow
       {shadow && (
         <span
           aria-hidden="true"
-          className="absolute left-1/2 -translate-x-1/2 rounded-[50%] blur-md"
+          className="absolute left-1/2 -translate-x-1/2 rounded-[50%] bg-[#111]/15"
           style={{
-            bottom: "0%",
-            width: "calc(var(--s) * 1.05)",
-            height: "calc(var(--s) * 0.14)",
-            background: "radial-gradient(closest-side, rgba(17,19,23,0.28), rgba(17,19,23,0))",
+            bottom: "2%",
+            width: "calc(var(--s) * 0.95)",
+            height: "calc(var(--s) * 0.1)",
           }}
         />
       )}

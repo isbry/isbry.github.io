@@ -4,7 +4,6 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        serif: ['"Instrument Serif"', "ui-serif", "Georgia", "serif"],
         sans: ['"Geist Variable"', "ui-sans-serif", "system-ui", "sans-serif"],
       },
     },

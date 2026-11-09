@@ -103,22 +103,13 @@ function useCubeScroll() {
   return { active, rotateX, rotateY, goTo };
 }
 
-function Dot({ brick, className = "h-2.5 w-2.5" }) {
-  const b = bricks[brick];
-  return (
-    <span
-      aria-hidden="true"
-      className={`inline-block shrink-0 rounded-full ${className}`}
-      style={{ backgroundColor: b.hex, boxShadow: brick === "white" ? "inset 0 0 0 1px #c9cdd3" : "none" }}
-    />
-  );
-}
+const BANDS = ["#3B78F5", "#22B573", "#FF8A34", "#FFD43B"];
 
-// Six colour dots under the cube, one per face. The current face's name sits underneath.
-function SidesNav({ active, onSelect }) {
+// Six colour keys under the cube, one per face. The current one is pressed in.
+function SideKeys({ active, onSelect }) {
   return (
-    <nav aria-label="Sides of me" className="flex flex-col items-center gap-3">
-      <ul className="flex items-center gap-3">
+    <nav aria-label="Sides of me">
+      <ul className="grid grid-cols-6 gap-2.5">
         {facets.map((facet, index) => {
           const current = index === active;
           return (
@@ -131,129 +122,122 @@ function SidesNav({ active, onSelect }) {
                   e.preventDefault();
                   onSelect(index);
                 }}
-                className="group flex h-7 w-7 items-center justify-center rounded-full"
-              >
-                <span
-                  className={`block rounded-full transition-all duration-300 ${current ? "h-3.5 w-3.5" : "h-2.5 w-2.5 opacity-50 group-hover:opacity-100"}`}
-                  style={{
-                    backgroundColor: bricks[facet.brick].hex,
-                    boxShadow: current
-                      ? `0 0 0 3px var(--canvas), 0 0 0 4.5px ${bricks[facet.brick].accent}`
-                      : facet.brick === "white"
-                        ? "inset 0 0 0 1px #c9cdd3"
-                        : "none",
-                  }}
-                />
-              </a>
+                className={`block h-10 w-10 rounded-xl border-[3px] border-[#111] transition-[transform,box-shadow] duration-100 sm:h-11 sm:w-11 ${
+                  current ? "translate-x-1 translate-y-1 shadow-none" : "shadow-[4px_4px_0_#111] hover:-translate-x-px hover:-translate-y-px hover:shadow-[5px_5px_0_#111]"
+                }`}
+                style={{ backgroundColor: bricks[facet.brick].hex }}
+              />
             </li>
           );
         })}
       </ul>
-      <p className="text-center text-sm leading-snug" aria-live="polite">
-        <span className="font-medium text-[var(--ink)]">{facets[active].title}</span>
-        <span className="block text-[var(--muted)]">{facets[active].subtitle}</span>
-      </p>
     </nav>
   );
 }
 
-function FacetSection({ facet, dimmed, onOpen }) {
+function FacetCard({ facet, dimmed, onOpen }) {
   const brick = bricks[facet.brick];
   return (
     <section
       id={facet.id}
       aria-labelledby={`${facet.id}-title`}
-      className={`scroll-mt-16 py-16 transition-opacity duration-700 lg:min-h-[72vh] lg:py-20 ${dimmed ? "opacity-40" : "opacity-100"}`}
+      className={`box scroll-mt-8 overflow-hidden bg-white transition-[opacity,transform] duration-500 ${dimmed ? "rotate-[-0.6deg] opacity-45" : "opacity-100"}`}
     >
-      <h2 id={`${facet.id}-title`} className="flex items-center gap-2.5 text-[15px] font-medium text-[var(--muted)]">
-        <Dot brick={facet.brick} />
-        {facet.title}
-      </h2>
+      <header
+        className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b-[3px] border-[#111] px-6 py-4 sm:px-7"
+        style={{ backgroundColor: brick.hex, color: brick.ink }}
+      >
+        <h2 id={`${facet.id}-title`} className="text-[22px] font-extrabold tracking-[-0.02em]">
+          {facet.title}
+        </h2>
+        <p className="text-sm font-semibold">{facet.subtitle}</p>
+      </header>
 
-      <div className="mt-6 flex items-start gap-6">
-        {facet.photo && (
-          <img
-            src={facet.photo}
-            alt="Brayan Caicedo"
-            width="96"
-            height="96"
-            loading="lazy"
-            className="mt-1 h-20 w-20 shrink-0 rounded-full object-cover sm:h-24 sm:w-24"
-          />
-        )}
-        <p className="font-serif text-[32px] leading-[1.12] tracking-[-0.01em] sm:text-[40px]">{facet.intro}</p>
-      </div>
+      <div className="px-6 pb-8 pt-7 sm:px-7">
+        <div className="flex items-start gap-5">
+          {facet.photo && (
+            <img
+              src={facet.photo}
+              alt="Brayan Caicedo"
+              width="96"
+              height="96"
+              loading="lazy"
+              className="box-sm h-20 w-20 shrink-0 -rotate-3 object-cover sm:h-24 sm:w-24"
+            />
+          )}
+          <p className="text-[26px] font-extrabold leading-[1.12] tracking-[-0.03em] sm:text-[32px]">{facet.intro}</p>
+        </div>
 
-      <div className="mt-8 max-w-[62ch] space-y-5">
-        {facet.body.split("\n\n").map((paragraph) => (
-          <p key={paragraph.slice(0, 24)} className="text-[17px] leading-[1.7] text-[var(--body)]">
-            {paragraph}
-          </p>
-        ))}
-      </div>
-
-      {facet.highlights?.length > 0 && (
-        <ul className="mt-10 border-b border-[var(--line)]">
-          {facet.highlights.map((h) => (
-            <HighlightRow key={h.label} highlight={h} onOpen={(modal) => onOpen({ ...modal, accent: brick.accent })} accent={brick.accent} />
-          ))}
-        </ul>
-      )}
-
-      {facet.tags && (
-        <ul className="mt-8 flex flex-wrap gap-2" aria-label="Keywords">
-          {facet.tags.map((tag) => (
-            <li key={tag} className="rounded-full bg-white px-3 py-1 text-[13px] text-[var(--body)] ring-1 ring-[var(--line)]">
-              {tag}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {facet.links?.length > 0 && (
-        <div className="mt-8 flex flex-wrap gap-3">
-          {facet.links.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-[15px] font-medium ring-1 ring-[var(--line)] transition-shadow hover:ring-[var(--ink)]"
-            >
-              <Icon name={link.icon} className="h-4 w-4" />
-              {link.label}
-            </a>
+        <div className="mt-2 max-w-[62ch]">
+          {facet.body.split("\n\n").map((paragraph) => (
+            <p key={paragraph.slice(0, 24)} className="mt-4 text-[17px] leading-[1.65] text-[var(--body)]">
+              {paragraph}
+            </p>
           ))}
         </div>
-      )}
+
+        {facet.highlights?.length > 0 && (
+          <ul className="mt-7 space-y-3">
+            {facet.highlights.map((h) => (
+              <HighlightRow key={h.label} highlight={h} onOpen={(modal) => onOpen({ ...modal, accent: brick.hex })} />
+            ))}
+          </ul>
+        )}
+
+        {facet.tags && (
+          <ul className="mt-6 flex flex-wrap gap-2" aria-label="Keywords">
+            {facet.tags.map((tag) => (
+              <li key={tag} className="rounded-full border-2 border-[#111] bg-white px-3 py-1 text-[13px] font-semibold">
+                {tag}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {facet.links?.length > 0 && (
+          <div className="mt-7 flex flex-wrap gap-3">
+            {facet.links.map((link) => (
+              <a key={link.label} href={link.href} className="box-sm press inline-flex items-center gap-2 bg-[#FFD43B] px-4 py-2.5 font-bold">
+                <Icon name={link.icon} className="h-4 w-4" />
+                {link.label}
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
     </section>
   );
 }
 
 function WorkSection() {
   return (
-    <section id="work" aria-labelledby="work-title" className="mx-auto w-full max-w-[1200px] px-6 py-24 lg:px-10 lg:py-32">
-      <h2 id="work-title" className="font-serif text-[44px] leading-none tracking-[-0.01em] sm:text-[60px]">
+    <section id="work" aria-labelledby="work-title" className="mx-auto w-full max-w-[1280px] px-5 pb-10 pt-24 sm:px-10 lg:pt-32">
+      <h2 id="work-title" className="text-[52px] font-extrabold leading-[0.95] tracking-[-0.05em] sm:text-[80px]">
         Things I've built
       </h2>
-      <p className="mt-4 max-w-[52ch] text-[17px] text-[var(--muted)]">Recent work and research, in plain words. The numbers are in my CV.</p>
+      <p className="mt-4 max-w-[52ch] text-lg font-medium text-[var(--muted)]">Recent work and research, in plain words. The numbers are in my CV.</p>
 
-      <div className="mt-14 grid gap-x-16 gap-y-14 md:grid-cols-2">
-        {work.map((item) => (
-          <article key={item.id} className="border-t border-[var(--line)] pt-7">
-            <h3 className="font-serif text-[30px] leading-tight">{item.name}</h3>
-            <p className="mt-1 text-sm text-[var(--muted)]">{item.context}</p>
-            <p className="mt-4 max-w-[58ch] text-[16px] leading-[1.7] text-[var(--body)]">{item.summary}</p>
-            <p className="mt-4 text-sm text-[var(--muted)]">{item.stack.join(", ")}</p>
-            {item.link && (
-              <a
-                href={item.link.href}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-5 inline-flex items-center gap-1.5 text-[15px] font-medium underline decoration-[var(--line)] decoration-2 underline-offset-[5px] transition-colors hover:decoration-[var(--ink)]"
-              >
-                {item.link.label}
-                <Icon name="external" className="h-3.5 w-3.5" />
-              </a>
-            )}
+      <div className="mt-12 grid gap-7 md:grid-cols-2">
+        {work.map((item, i) => (
+          <article key={item.id} className="box overflow-hidden bg-white">
+            <div aria-hidden="true" className="h-[18px] border-b-[3px] border-[#111]" style={{ backgroundColor: BANDS[i % BANDS.length] }} />
+            <div className="px-6 pb-7 pt-6 sm:px-7">
+              <h3 className="text-[28px] font-extrabold tracking-[-0.03em]">{item.name}</h3>
+              <p className="mt-1 text-sm font-semibold text-[var(--muted)]">{item.context}</p>
+              <p className="mt-4 text-base leading-[1.65] text-[var(--body)]">{item.summary}</p>
+              <p className="mt-4 text-[13px] font-semibold">{item.stack.join(", ")}</p>
+              {item.link && (
+                <a
+                  href={item.link.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="box-sm press mt-5 inline-flex items-center gap-2 bg-[#FFD43B] px-4 py-2.5 font-extrabold"
+                >
+                  {item.link.label}
+                  <Icon name="external" className="h-4 w-4" />
+                </a>
+              )}
+            </div>
           </article>
         ))}
       </div>
@@ -270,8 +254,9 @@ export default function App() {
   const sidesRef = useRef(null);
   const year = new Date().getFullYear();
   const closeModal = useCallback(() => setModal(null), []);
+  const current = facets[active];
 
-  // Sections only dim once the script is running, so the prerendered page reads normally.
+  // Cards only dim once the script is running, so the prerendered page reads normally.
   useEffect(() => setReady(true), []);
 
   // On small screens the big cube scrolls away, so a small one follows you
@@ -295,136 +280,135 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen overflow-x-clip">
-      <header className="mx-auto flex w-full max-w-[1200px] items-center justify-between px-6 py-6 lg:px-10">
-        <a href="/" className="font-serif text-[24px] leading-none">
-          Brayan Caicedo
+      <header className="mx-auto flex w-full max-w-[1280px] items-center justify-between px-5 py-6 sm:px-10">
+        <a href="/" className="box-sm press bg-[#FFD43B] px-3.5 py-1.5 text-xl font-extrabold tracking-[-0.03em]">
+          isbry
         </a>
-        <nav aria-label="Main" className="flex items-center gap-1 text-[15px] sm:gap-2">
-          <a href="#work" className="hidden rounded-full px-3 py-2 text-[var(--muted)] transition-colors hover:text-[var(--ink)] sm:inline-block">
+        <nav aria-label="Main" className="flex items-center gap-1 text-[15px] font-semibold sm:gap-3">
+          <a href="#work" className="hidden px-3 py-2 hover:underline hover:decoration-2 hover:underline-offset-4 sm:inline-block">
             Work
           </a>
-          <a href="#contact" className="hidden rounded-full px-3 py-2 text-[var(--muted)] transition-colors hover:text-[var(--ink)] sm:inline-block">
+          <a href="#contact" className="hidden px-3 py-2 hover:underline hover:decoration-2 hover:underline-offset-4 sm:inline-block">
             Contact
           </a>
-          <a
-            href={CV}
-            download="Brayan_Caicedo_CV.pdf"
-            className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 font-medium ring-1 ring-[var(--line)] transition-shadow hover:ring-[var(--ink)]"
-          >
+          <a href={CV} download="Brayan_Caicedo_CV.pdf" className="box-sm press inline-flex items-center gap-2 bg-white px-4 py-2">
             <Icon name="download" className="h-4 w-4" />
             CV
           </a>
         </nav>
       </header>
 
-      <main className="mx-auto grid w-full max-w-[1200px] gap-x-16 px-6 [grid-template-areas:'intro'_'cube'_'sides'] lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:px-10 lg:[grid-template-areas:'cube_intro'_'cube_sides']">
-        <section aria-labelledby="name" className="pb-6 pt-10 [grid-area:intro] lg:pb-20 lg:pt-24">
-          <h1 id="name" className="font-serif text-[64px] leading-[0.95] tracking-[-0.02em] sm:text-[88px] xl:text-[104px]">
-            Brayan Caicedo
+      <main className="mx-auto grid w-full max-w-[1280px] gap-x-16 px-5 [grid-template-areas:'intro'_'cube'_'sides'] sm:px-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:[grid-template-areas:'cube_intro'_'cube_sides']">
+        <section aria-labelledby="name" className="pb-4 pt-8 [grid-area:intro] lg:pb-28 lg:pt-16">
+          <h1 id="name" className="text-[76px] font-extrabold leading-[0.86] tracking-[-0.055em] sm:text-[112px] xl:text-[132px]">
+            Brayan
+            <br />
+            <span className="box mt-3 inline-block -rotate-2 bg-[#F0524D] px-4 pb-3 text-white">Caicedo</span>
           </h1>
-          <p className="mt-7 max-w-[36ch] text-[20px] leading-[1.5] text-[var(--ink)] sm:text-[22px]">
-            Platform engineer. I build and run the infrastructure AI products depend on, from Kubernetes clusters to GPU fleets.
+          <p className="mt-9 max-w-[32ch] text-[21px] font-medium leading-[1.45]">
+            Platform engineer in Canterbury, UK. I build and run the infrastructure AI products depend on, from Kubernetes clusters to GPU fleets.
           </p>
-          <p className="mt-4 max-w-[52ch] text-[15px] text-[var(--muted)]">
-            Based in Canterbury, UK. Eligible for the UK Graduate visa, no sponsorship required.
-          </p>
-          <div className="mt-9 flex flex-wrap items-center gap-3">
-            <a
-              href={CV}
-              download="Brayan_Caicedo_CV.pdf"
-              className="inline-flex items-center gap-2 rounded-full bg-[var(--ink)] px-5 py-3 text-[15px] font-medium text-white transition-opacity hover:opacity-85"
-            >
-              <Icon name="download" className="h-4 w-4" />
+          <p className="mt-3 text-[15px] font-semibold text-[var(--muted)]">Eligible for the UK Graduate visa, no sponsorship required.</p>
+          <div className="mt-8 flex flex-wrap items-center gap-3.5">
+            <a href={CV} download="Brayan_Caicedo_CV.pdf" className="box press inline-flex items-center gap-2 bg-[#FFD43B] px-5 py-3.5 font-extrabold">
+              <Icon name="download" className="h-[18px] w-[18px]" />
               Download CV
             </a>
-            <a
-              href={`mailto:${EMAIL}`}
-              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-[15px] font-medium ring-1 ring-[var(--line)] transition-shadow hover:ring-[var(--ink)]"
-            >
-              <Icon name="mail" className="h-4 w-4" />
+            <a href={`mailto:${EMAIL}`} className="box press inline-flex items-center gap-2 bg-white px-5 py-3.5 font-extrabold">
+              <Icon name="mail" className="h-[18px] w-[18px]" />
               Email me
             </a>
-            <span className="ml-1 flex items-center gap-1">
-              <a href={LINKEDIN} target="_blank" rel="noreferrer" aria-label="LinkedIn" className="rounded-full p-2.5 text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
-                <Icon name="linkedin" className="h-[18px] w-[18px]" />
-              </a>
-              <a href={GITHUB} target="_blank" rel="noreferrer" aria-label="GitHub" className="rounded-full p-2.5 text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
-                <Icon name="github" className="h-[18px] w-[18px]" />
-              </a>
-            </span>
+            <a href={LINKEDIN} target="_blank" rel="noreferrer" aria-label="LinkedIn" className="box-sm press grid h-12 w-12 place-items-center bg-white">
+              <Icon name="linkedin" className="h-5 w-5" />
+            </a>
+            <a href={GITHUB} target="_blank" rel="noreferrer" aria-label="GitHub" className="box-sm press grid h-12 w-12 place-items-center bg-white">
+              <Icon name="github" className="h-5 w-5" />
+            </a>
           </div>
+          <ul className="mt-11 flex flex-wrap gap-3.5" aria-label="A few numbers">
+            {[
+              ["4M", "users at PayU"],
+              ["99.5%", "uptime at LATAM"],
+              ["US$10k", "a month saved"],
+            ].map(([n, label]) => (
+              <li key={n} className="box bg-white px-4 py-3 text-sm font-semibold">
+                <span className="block text-[26px] font-extrabold leading-tight tracking-[-0.03em]">{n}</span>
+                {label}
+              </li>
+            ))}
+          </ul>
         </section>
 
         <div className="[grid-area:cube] lg:sticky lg:top-0 lg:h-screen lg:self-start">
-          <div className="relative flex h-full flex-col items-center justify-center gap-4 pb-6 lg:pb-0">
-            {/* Soft light behind the cube, in the colour of the face you're reading.
-                One layer per face, cross-faded, because gradients can't be transitioned. */}
-            {facets.map((facet, index) => (
-              <div
-                key={facet.id}
-                aria-hidden="true"
-                className="pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-[56%] transition-opacity duration-700 sm:h-[640px] sm:w-[640px]"
-                style={{
-                  opacity: index === active ? 1 : 0,
-                  background: `radial-gradient(closest-side, color-mix(in srgb, ${bricks[facet.brick].hex} ${facet.brick === "white" ? 0 : 22}%, transparent), transparent)`,
-                }}
-              />
-            ))}
-            <div ref={heroCubeRef} className="cube-float relative">
-              <Cube rotateX={rotateX} rotateY={rotateY} onSelectFace={goTo} sizeClass="[--s:190px] sm:[--s:230px] lg:[--s:250px] xl:[--s:270px]" />
-            </div>
+          <div className="flex h-full flex-col items-center justify-center gap-8 py-8 lg:py-0">
             <div className="relative">
-              <SidesNav active={active} onSelect={goTo} />
+              <div ref={heroCubeRef} className="cube-float">
+                <Cube rotateX={rotateX} rotateY={rotateY} onSelectFace={goTo} sizeClass="[--s:190px] sm:[--s:240px] xl:[--s:270px]" shadow />
+              </div>
+              {/* Label for the side in front. It pops each time the side changes. */}
+              <div aria-hidden="true" className="absolute -left-3 -top-[6%] sm:-left-16 sm:-top-[4%]">
+                <p key={current.id} className="box pop inline-flex -rotate-[4deg] items-center gap-2.5 bg-white px-4 py-2.5 text-base font-extrabold sm:text-lg">
+                  <span className="h-4 w-4 rounded-[5px] border-[3px] border-[#111]" style={{ backgroundColor: bricks[current.brick].hex }} />
+                  {current.title}
+                </p>
+                <p className="ml-3 mt-2 hidden max-w-[230px] rotate-[3deg] rounded-2xl bg-[#111] px-3 py-1.5 text-[13px] font-semibold leading-snug text-white sm:block">
+                  {current.subtitle}
+                </p>
+              </div>
+              <div
+                aria-hidden="true"
+                className="box absolute -right-3 -top-4 grid h-24 w-24 rotate-12 place-items-center rounded-full bg-[#22B573] text-center text-[13px] font-extrabold leading-tight text-white sm:-right-8 sm:h-28 sm:w-28 sm:text-[15px]"
+              >
+                CKA
+                <br />
+                CKAD
+                <br />
+                KCSA
+              </div>
             </div>
+            <SideKeys active={active} onSelect={goTo} />
           </div>
         </div>
 
-        <div ref={sidesRef} className="[grid-area:sides]">
+        <div ref={sidesRef} className="flex flex-col gap-11 pb-10 [grid-area:sides]">
           {facets.map((facet, index) => (
-            <FacetSection key={facet.id} facet={facet} dimmed={ready && index !== active} onOpen={setModal} />
+            <FacetCard key={facet.id} facet={facet} dimmed={ready && index !== active} onOpen={setModal} />
           ))}
         </div>
       </main>
 
       <div
         aria-hidden="true"
-        className={`pointer-events-none fixed bottom-3 right-3 z-30 drop-shadow-lg transition-all duration-500 lg:hidden ${
+        className={`box-sm pointer-events-none fixed bottom-3 right-3 z-30 bg-white p-1 transition-all duration-300 lg:hidden ${
           showMini ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
         }`}
       >
-        <Cube rotateX={rotateX} rotateY={rotateY} sizeClass="[--s:40px]" shadow={false} />
-      </div>
-
-      <div className="mx-auto w-full max-w-[1200px] px-6 lg:px-10">
-        <div className="border-t border-[var(--line)]" />
+        <Cube rotateX={rotateX} rotateY={rotateY} sizeClass="[--s:38px]" shadow={false} />
       </div>
 
       <WorkSection />
 
-      <footer id="contact" className="mx-auto w-full max-w-[1200px] px-6 pb-14 lg:px-10">
-        <div className="border-t border-[var(--line)] pt-20 lg:pt-28">
-          <h2 className="max-w-[18ch] font-serif text-[44px] leading-[1.02] tracking-[-0.01em] sm:text-[64px]">
+      <footer id="contact" className="mx-auto w-full max-w-[1280px] px-5 pb-12 pt-20 sm:px-10">
+        <div className="box bg-[#3B78F5] px-7 py-14 text-white sm:px-14 sm:py-16">
+          <h2 className="max-w-[16ch] text-[44px] font-extrabold leading-[0.95] tracking-[-0.05em] sm:text-[72px]">
             Open to platform and AI infrastructure roles in the UK.
           </h2>
-          <a
-            href={`mailto:${EMAIL}`}
-            className="mt-10 inline-block break-all text-[20px] font-medium underline decoration-[var(--line)] decoration-2 underline-offset-[8px] transition-colors hover:decoration-[var(--ink)] sm:text-[24px]"
-          >
+          <a href={`mailto:${EMAIL}`} className="box press mt-9 inline-block break-all bg-white px-5 py-4 text-lg font-extrabold text-[#111] sm:px-6 sm:text-[22px]">
             {EMAIL}
           </a>
-          <div className="mt-16 flex flex-wrap items-center justify-between gap-6 text-sm text-[var(--muted)]">
-            <p>© {year} Brayan Caicedo</p>
-            <div className="flex flex-wrap gap-x-6 gap-y-2">
-              <a href={LINKEDIN} target="_blank" rel="noreferrer" className="transition-colors hover:text-[var(--ink)]">
-                LinkedIn
-              </a>
-              <a href={GITHUB} target="_blank" rel="noreferrer" className="transition-colors hover:text-[var(--ink)]">
-                GitHub
-              </a>
-              <a href={CV} download="Brayan_Caicedo_CV.pdf" className="transition-colors hover:text-[var(--ink)]">
-                CV (PDF)
-              </a>
-            </div>
+        </div>
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-4 text-sm font-semibold">
+          <p>© {year} Brayan Caicedo</p>
+          <div className="flex flex-wrap gap-x-6 gap-y-2">
+            <a href={LINKEDIN} target="_blank" rel="noreferrer" className="hover:underline hover:decoration-2 hover:underline-offset-4">
+              LinkedIn
+            </a>
+            <a href={GITHUB} target="_blank" rel="noreferrer" className="hover:underline hover:decoration-2 hover:underline-offset-4">
+              GitHub
+            </a>
+            <a href={CV} download="Brayan_Caicedo_CV.pdf" className="hover:underline hover:decoration-2 hover:underline-offset-4">
+              CV (PDF)
+            </a>
           </div>
         </div>
       </footer>
