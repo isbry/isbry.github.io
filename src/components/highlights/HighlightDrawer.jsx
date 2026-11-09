@@ -28,7 +28,7 @@ export default function HighlightDrawer({ modal, onClose, accent }) {
         <>
           <motion.div
             key="backdrop"
-            className="fixed inset-0 z-40 bg-[#05131d]/25 backdrop-blur-[2px]"
+            className="fixed inset-0 z-40 bg-[#111317]/20 backdrop-blur-[2px]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -40,13 +40,13 @@ export default function HighlightDrawer({ modal, onClose, accent }) {
             role="dialog"
             aria-modal="true"
             aria-labelledby="drawer-title"
-            className="fixed inset-y-0 right-0 z-50 flex w-full flex-col overflow-y-auto bg-[var(--plate)] shadow-2xl sm:w-[540px]"
+            className="fixed inset-y-0 right-0 z-50 flex w-full flex-col overflow-y-auto bg-[var(--canvas)] shadow-2xl sm:w-[540px]"
             initial={reduce ? { opacity: 0 } : { x: "100%" }}
             animate={reduce ? { opacity: 1 } : { x: 0 }}
             exit={reduce ? { opacity: 0 } : { x: "100%" }}
             transition={{ type: "spring", stiffness: 320, damping: 34, mass: 0.8 }}
           >
-            <div className="h-2 w-full shrink-0" style={{ backgroundColor: accent }} />
+            <div className="h-1 w-full shrink-0" style={{ backgroundColor: accent }} />
             <div className="flex justify-end px-5 pt-4">
               <button
                 ref={closeRef}
@@ -61,7 +61,7 @@ export default function HighlightDrawer({ modal, onClose, accent }) {
 
             <div className="px-8 pb-12 sm:px-10">
               <p className="text-base font-medium text-[var(--muted)]">{modal.company}</p>
-              <h2 id="drawer-title" className="mt-1 text-3xl font-bold leading-tight tracking-tight">
+              <h2 id="drawer-title" className="mt-1 font-serif text-[40px] leading-[1.05]">
                 {modal.role}
               </h2>
               <p className="mt-2 text-[15px] text-[var(--muted)]">
@@ -69,14 +69,14 @@ export default function HighlightDrawer({ modal, onClose, accent }) {
                 {modal.location ? `, ${modal.location}` : ""}
               </p>
 
-              <p className="mt-8 text-lg leading-relaxed">{modal.summary}</p>
+              <p className="mt-8 text-[18px] leading-relaxed text-[var(--ink)]">{modal.summary}</p>
 
               <ul className="mt-8 space-y-4">
                 {modal.bullets.map((bullet) => (
-                  <li key={bullet} className="flex gap-3 text-base leading-relaxed text-[#26323c]">
+                  <li key={bullet} className="flex gap-3 text-base leading-relaxed text-[var(--body)]">
                     <span
                       aria-hidden="true"
-                      className="mt-[0.55em] h-2 w-2 shrink-0 rounded-[2px]"
+                      className="mt-[0.6em] h-1.5 w-1.5 shrink-0 rounded-full"
                       style={{ backgroundColor: accent }}
                     />
                     {bullet}
@@ -84,10 +84,10 @@ export default function HighlightDrawer({ modal, onClose, accent }) {
                 ))}
               </ul>
 
-              <h3 className="mt-10 text-base font-semibold">Stack</h3>
+              <h3 className="mt-10 text-sm font-medium text-[var(--muted)]">Stack</h3>
               <ul className="mt-3 flex flex-wrap gap-2">
                 {modal.stack.map((tag) => (
-                  <li key={tag} className="rounded-md border border-[var(--line)] bg-white/80 px-2.5 py-1 text-sm text-[#26323c]">
+                  <li key={tag} className="rounded-full bg-white px-3 py-1 text-[13px] text-[var(--body)] ring-1 ring-[var(--line)]">
                     {tag}
                   </li>
                 ))}

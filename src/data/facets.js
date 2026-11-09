@@ -1,12 +1,12 @@
-// Brick colours used across the site: cube faces, markers and the
-// floating bricks in the background all share these.
+// Cube colours. hex paints the tiles; accent is a slightly deeper tone for
+// lines and dots on the page, so yellow and white stay visible on light grey.
 export const bricks = {
-  red: { hex: "#C91A09", accent: "#C91A09", ink: "#FFFFFF" },
-  blue: { hex: "#0055BF", accent: "#0055BF", ink: "#FFFFFF" },
-  yellow: { hex: "#F2CD37", accent: "#F2CD37", ink: "#05131D" },
-  green: { hex: "#237841", accent: "#237841", ink: "#FFFFFF" },
-  orange: { hex: "#FE8A18", accent: "#FE8A18", ink: "#05131D" },
-  white: { hex: "#FFFFFF", accent: "#8A9097", ink: "#05131D" },
+  red: { hex: "#F0524D", accent: "#E5433E", ink: "#FFFFFF" },
+  blue: { hex: "#3B78F5", accent: "#2F6AE6", ink: "#FFFFFF" },
+  yellow: { hex: "#FFD43B", accent: "#E8B800", ink: "#111317" },
+  green: { hex: "#22B573", accent: "#169E61", ink: "#FFFFFF" },
+  orange: { hex: "#FF8A34", accent: "#F27A1F", ink: "#111317" },
+  white: { hex: "#F4F4F2", accent: "#9AA0A8", ink: "#111317" },
 };
 
 export const facets = [
@@ -238,13 +238,13 @@ export const facets = [
       { label: "Akai Mini", detail: "Learning music production, still very bad at it" },
       {
         label: "This site",
-        detail: "A Lego Rubik's cube that turns as you read",
+        detail: "A Rubik's cube that turns as you read",
         modal: {
           company: "Personal",
           role: "isbry.com",
           period: "2026",
           location: "Canterbury, UK",
-          summary: "A personal site built around a Rubik's cube made of Lego plates. Each face of the cube is a different side of me.",
+          summary: "A personal site built around a Rubik's cube. Each face of the cube is a different side of me.",
           bullets: [
             "The cube is plain CSS 3D. Scrolling through the page turns it, so the face in front always matches the section you're reading.",
             "Click a face or a colour and the page takes you to that section.",

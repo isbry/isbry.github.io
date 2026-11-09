@@ -1,14 +1,16 @@
-@import "@fontsource-variable/bricolage-grotesque/opsz.css";
+@import "@fontsource/instrument-serif/latin-400.css";
+@import "@fontsource-variable/geist/index.css";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --plate: #edf0f3;
-  --ink: #05131d;
-  --muted: #4b5966;
-  --line: #d3d9df;
+  --canvas: #f7f7f8;
+  --ink: #111317;
+  --body: #3a404a;
+  --muted: #6b7280;
+  --line: #e4e6ea;
   color-scheme: light;
 }
 
@@ -20,36 +22,22 @@
 
   body {
     margin: 0;
-    background-color: var(--plate);
+    background-color: var(--canvas);
     color: var(--ink);
-    font-family: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
-    font-optical-sizing: auto;
+    font-family: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
 
-  /* A light Lego baseplate: one stud every 28px, lit from the top left. */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background-image:
-      radial-gradient(circle at 13px 13px, rgba(255, 255, 255, 0.75) 0 4.5px, transparent 5.5px),
-      radial-gradient(circle at 15px 15px, rgba(5, 19, 29, 0.035) 0 5px, transparent 6px);
-    background-size: 28px 28px;
-  }
-
   ::selection {
-    background: #f2cd37;
+    background: #ffd43b;
     color: var(--ink);
   }
 
   :focus-visible {
     outline: 2px solid var(--ink);
     outline-offset: 3px;
-    border-radius: 4px;
+    border-radius: 6px;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -66,28 +54,16 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-8px);
+    transform: translateY(-7px);
   }
 }
 
 .cube-float {
-  animation: cube-float 6s ease-in-out infinite;
+  animation: cube-float 7s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .cube-float {
     animation: none;
-  }
-}
-
-@layer components {
-  /* A stud seen from above: flat top, lit edge top left, shaded edge bottom right. */
-  .stud {
-    border-radius: 9999px;
-    background-color: currentColor;
-    box-shadow:
-      inset 1.5px 1.5px 0 rgba(255, 255, 255, 0.38),
-      inset -1px -1px 0 rgba(0, 0, 0, 0.14),
-      1px 2px 2px rgba(0, 0, 0, 0.28);
   }
 }

@@ -2,7 +2,7 @@
 
 My personal site. Not a portfolio, not a CV, just an honest look at who I am.
 
-It's built around a Rubik's cube made of Lego plates, because I love both. Each face is a different side of me: platform engineer, AI explorer, learner, builder, personal life and writing. Scroll the page and the cube turns to the face of the section you're reading. Click a face and the page takes you there.
+It's built around a Rubik's cube, because I love them. Each face is a different side of me: platform engineer, AI explorer, learner, builder, personal life and writing. Scroll the page and the cube turns to the face of the section you're reading. Click a face and the page takes you there.
 
 ## Stack
 

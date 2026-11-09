@@ -103,58 +103,56 @@ function useCubeScroll() {
   return { active, rotateX, rotateY, goTo };
 }
 
-function Logo() {
-  // A 2x2 plate seen from above, in four of the cube colours.
-  const colors = [bricks.red.hex, bricks.blue.hex, bricks.yellow.hex, bricks.green.hex];
-  return (
-    <span aria-hidden="true" className="grid h-9 w-9 grid-cols-2 gap-[3px] rounded-[9px] bg-[#05131d] p-[4px]">
-      {colors.map((c) => (
-        <span key={c} className="flex items-center justify-center rounded-[4px]" style={{ backgroundColor: c, color: c }}>
-          <span className="stud block h-[60%] w-[60%]" />
-        </span>
-      ))}
-    </span>
-  );
-}
-
-// A tiny 3x3 face in the facet's colour, used next to section titles and in the nav.
-function FaceMark({ brick, size = "h-5 w-5" }) {
+function Dot({ brick, className = "h-2.5 w-2.5" }) {
   const b = bricks[brick];
   return (
-    <span aria-hidden="true" className={`grid shrink-0 grid-cols-3 gap-[1.5px] rounded-[4px] bg-[#05131d] p-[2px] ${size}`}>
-      {Array.from({ length: 9 }).map((_, i) => (
-        <span key={i} className="rounded-[1px]" style={{ backgroundColor: b.hex }} />
-      ))}
-    </span>
+    <span
+      aria-hidden="true"
+      className={`inline-block shrink-0 rounded-full ${className}`}
+      style={{ backgroundColor: b.hex, boxShadow: brick === "white" ? "inset 0 0 0 1px #c9cdd3" : "none" }}
+    />
   );
 }
 
+// Six colour dots under the cube, one per face. The current face's name sits underneath.
 function SidesNav({ active, onSelect }) {
   return (
-    <nav aria-label="Sides of me" className="w-full max-w-[400px]">
-      <ul className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+    <nav aria-label="Sides of me" className="flex flex-col items-center gap-3">
+      <ul className="flex items-center gap-3">
         {facets.map((facet, index) => {
           const current = index === active;
           return (
             <li key={facet.id}>
               <a
                 href={`#${facet.id}`}
+                aria-label={facet.title}
                 aria-current={current ? "true" : undefined}
                 onClick={(e) => {
                   e.preventDefault();
                   onSelect(index);
                 }}
-                className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[15px] leading-tight transition-colors ${
-                  current ? "bg-white font-semibold text-[var(--ink)] shadow-[0_1px_0_rgba(5,19,29,0.08)]" : "text-[var(--muted)] hover:bg-white/60 hover:text-[var(--ink)]"
-                }`}
+                className="group flex h-7 w-7 items-center justify-center rounded-full"
               >
-                <FaceMark brick={facet.brick} size="h-[18px] w-[18px]" />
-                {facet.title}
+                <span
+                  className={`block rounded-full transition-all duration-300 ${current ? "h-3.5 w-3.5" : "h-2.5 w-2.5 opacity-50 group-hover:opacity-100"}`}
+                  style={{
+                    backgroundColor: bricks[facet.brick].hex,
+                    boxShadow: current
+                      ? `0 0 0 3px var(--canvas), 0 0 0 4.5px ${bricks[facet.brick].accent}`
+                      : facet.brick === "white"
+                        ? "inset 0 0 0 1px #c9cdd3"
+                        : "none",
+                  }}
+                />
               </a>
             </li>
           );
         })}
       </ul>
+      <p className="text-center text-sm leading-snug" aria-live="polite">
+        <span className="font-medium text-[var(--ink)]">{facets[active].title}</span>
+        <span className="block text-[var(--muted)]">{facets[active].subtitle}</span>
+      </p>
     </nav>
   );
 }
@@ -165,42 +163,37 @@ function FacetSection({ facet, dimmed, onOpen }) {
     <section
       id={facet.id}
       aria-labelledby={`${facet.id}-title`}
-      className={`scroll-mt-20 border-t-2 pb-20 pt-8 transition-opacity duration-500 lg:min-h-[66vh] ${dimmed ? "opacity-50 lg:opacity-40" : "opacity-100"}`}
-      style={{ borderColor: brick.accent }}
+      className={`scroll-mt-16 py-16 transition-opacity duration-700 lg:min-h-[72vh] lg:py-20 ${dimmed ? "opacity-40" : "opacity-100"}`}
     >
-      <header className="flex items-center gap-3">
-        <FaceMark brick={facet.brick} />
-        <h2 id={`${facet.id}-title`} className="text-2xl font-bold leading-tight tracking-tight">
-          {facet.title}
-        </h2>
-      </header>
-      <p className="mt-1 text-[17px] text-[var(--muted)]">{facet.subtitle}</p>
+      <h2 id={`${facet.id}-title`} className="flex items-center gap-2.5 text-[15px] font-medium text-[var(--muted)]">
+        <Dot brick={facet.brick} />
+        {facet.title}
+      </h2>
 
-      <div className="mt-8 flex items-start gap-5">
+      <div className="mt-6 flex items-start gap-6">
         {facet.photo && (
           <img
             src={facet.photo}
             alt="Brayan Caicedo"
-            width="112"
-            height="112"
+            width="96"
+            height="96"
             loading="lazy"
-            className="h-24 w-24 shrink-0 rounded-2xl object-cover sm:h-28 sm:w-28"
-            style={{ boxShadow: `0 0 0 4px ${brick.accent}` }}
+            className="mt-1 h-20 w-20 shrink-0 rounded-full object-cover sm:h-24 sm:w-24"
           />
         )}
-        <p className="text-[21px] font-semibold leading-snug tracking-tight sm:text-[23px]">{facet.intro}</p>
+        <p className="font-serif text-[32px] leading-[1.12] tracking-[-0.01em] sm:text-[40px]">{facet.intro}</p>
       </div>
 
-      <div className="mt-6 max-w-[64ch] space-y-4">
+      <div className="mt-8 max-w-[62ch] space-y-5">
         {facet.body.split("\n\n").map((paragraph) => (
-          <p key={paragraph.slice(0, 24)} className="text-[17px] leading-[1.65] text-[#26323c]">
+          <p key={paragraph.slice(0, 24)} className="text-[17px] leading-[1.7] text-[var(--body)]">
             {paragraph}
           </p>
         ))}
       </div>
 
       {facet.highlights?.length > 0 && (
-        <ul className="mt-8 border-b border-[var(--line)]">
+        <ul className="mt-10 border-b border-[var(--line)]">
           {facet.highlights.map((h) => (
             <HighlightRow key={h.label} highlight={h} onOpen={(modal) => onOpen({ ...modal, accent: brick.accent })} accent={brick.accent} />
           ))}
@@ -208,9 +201,9 @@ function FacetSection({ facet, dimmed, onOpen }) {
       )}
 
       {facet.tags && (
-        <ul className="mt-6 flex flex-wrap gap-2" aria-label="Keywords">
+        <ul className="mt-8 flex flex-wrap gap-2" aria-label="Keywords">
           {facet.tags.map((tag) => (
-            <li key={tag} className="rounded-md border border-[var(--line)] bg-white/70 px-2.5 py-1 text-sm text-[#26323c]">
+            <li key={tag} className="rounded-full bg-white px-3 py-1 text-[13px] text-[var(--body)] ring-1 ring-[var(--line)]">
               {tag}
             </li>
           ))}
@@ -218,12 +211,12 @@ function FacetSection({ facet, dimmed, onOpen }) {
       )}
 
       {facet.links?.length > 0 && (
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="mt-8 flex flex-wrap gap-3">
           {facet.links.map((link) => (
             <a
               key={link.label}
               href={link.href}
-              className="inline-flex items-center gap-2 rounded-full border border-[#05131d] px-4 py-2 text-[15px] font-medium transition-colors hover:bg-[#05131d] hover:text-white"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-[15px] font-medium ring-1 ring-[var(--line)] transition-shadow hover:ring-[var(--ink)]"
             >
               <Icon name={link.icon} className="h-4 w-4" />
               {link.label}
@@ -237,36 +230,32 @@ function FacetSection({ facet, dimmed, onOpen }) {
 
 function WorkSection() {
   return (
-    <section id="work" aria-labelledby="work-title" className="mx-auto w-full max-w-[1240px] px-6 pb-20 lg:px-10">
-      <div className="rounded-[28px] bg-white px-6 py-12 sm:px-10 lg:px-14 lg:py-16">
-        <h2 id="work-title" className="text-[34px] font-bold leading-tight tracking-tight sm:text-[44px]">
-          Things I've built
-        </h2>
-        <p className="mt-2 max-w-[56ch] text-lg text-[var(--muted)]">
-          Recent work and research, in plain words. The numbers are in my CV.
-        </p>
+    <section id="work" aria-labelledby="work-title" className="mx-auto w-full max-w-[1200px] px-6 py-24 lg:px-10 lg:py-32">
+      <h2 id="work-title" className="font-serif text-[44px] leading-none tracking-[-0.01em] sm:text-[60px]">
+        Things I've built
+      </h2>
+      <p className="mt-4 max-w-[52ch] text-[17px] text-[var(--muted)]">Recent work and research, in plain words. The numbers are in my CV.</p>
 
-        <div className="mt-12 grid gap-x-14 gap-y-12 md:grid-cols-2">
-          {work.map((item) => (
-            <article key={item.id} className="border-t-2 border-[#05131d] pt-6">
-              <h3 className="text-2xl font-bold tracking-tight">{item.name}</h3>
-              <p className="mt-1 text-[15px] text-[var(--muted)]">{item.context}</p>
-              <p className="mt-4 max-w-[60ch] text-[17px] leading-[1.65] text-[#26323c]">{item.summary}</p>
-              <p className="mt-4 text-[15px] text-[var(--muted)]">{item.stack.join(", ")}</p>
-              {item.link && (
-                <a
-                  href={item.link.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-5 inline-flex items-center gap-2 text-[15px] font-semibold underline decoration-2 underline-offset-4 hover:decoration-[#F2CD37]"
-                >
-                  {item.link.label}
-                  <Icon name="external" className="h-4 w-4" />
-                </a>
-              )}
-            </article>
-          ))}
-        </div>
+      <div className="mt-14 grid gap-x-16 gap-y-14 md:grid-cols-2">
+        {work.map((item) => (
+          <article key={item.id} className="border-t border-[var(--line)] pt-7">
+            <h3 className="font-serif text-[30px] leading-tight">{item.name}</h3>
+            <p className="mt-1 text-sm text-[var(--muted)]">{item.context}</p>
+            <p className="mt-4 max-w-[58ch] text-[16px] leading-[1.7] text-[var(--body)]">{item.summary}</p>
+            <p className="mt-4 text-sm text-[var(--muted)]">{item.stack.join(", ")}</p>
+            {item.link && (
+              <a
+                href={item.link.href}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-5 inline-flex items-center gap-1.5 text-[15px] font-medium underline decoration-[var(--line)] decoration-2 underline-offset-[5px] transition-colors hover:decoration-[var(--ink)]"
+              >
+                {item.link.label}
+                <Icon name="external" className="h-3.5 w-3.5" />
+              </a>
+            )}
+          </article>
+        ))}
       </div>
     </section>
   );
@@ -306,22 +295,21 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen overflow-x-clip">
-      <header className="mx-auto flex w-full max-w-[1240px] items-center justify-between px-6 py-5 lg:px-10">
-        <a href="/" className="flex items-center gap-3 rounded-lg">
-          <Logo />
-          <span className="text-[17px] font-semibold tracking-tight">Brayan Caicedo</span>
+      <header className="mx-auto flex w-full max-w-[1200px] items-center justify-between px-6 py-6 lg:px-10">
+        <a href="/" className="font-serif text-[24px] leading-none">
+          Brayan Caicedo
         </a>
         <nav aria-label="Main" className="flex items-center gap-1 text-[15px] sm:gap-2">
-          <a href="#work" className="hidden rounded-full px-3 py-2 text-[var(--muted)] hover:text-[var(--ink)] sm:inline-block">
+          <a href="#work" className="hidden rounded-full px-3 py-2 text-[var(--muted)] transition-colors hover:text-[var(--ink)] sm:inline-block">
             Work
           </a>
-          <a href="#contact" className="hidden rounded-full px-3 py-2 text-[var(--muted)] hover:text-[var(--ink)] sm:inline-block">
+          <a href="#contact" className="hidden rounded-full px-3 py-2 text-[var(--muted)] transition-colors hover:text-[var(--ink)] sm:inline-block">
             Contact
           </a>
           <a
             href={CV}
             download="Brayan_Caicedo_CV.pdf"
-            className="inline-flex items-center gap-2 rounded-full bg-[#05131d] px-4 py-2 font-medium text-white transition-colors hover:bg-[#0055BF]"
+            className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 font-medium ring-1 ring-[var(--line)] transition-shadow hover:ring-[var(--ink)]"
           >
             <Icon name="download" className="h-4 w-4" />
             CV
@@ -329,59 +317,65 @@ export default function App() {
         </nav>
       </header>
 
-      <main className="mx-auto grid w-full max-w-[1240px] gap-x-14 px-6 [grid-template-areas:'intro'_'cube'_'sides'] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:px-10 lg:[grid-template-areas:'cube_intro'_'cube_sides']">
-        <section aria-labelledby="name" className="pb-10 pt-6 [grid-area:intro] lg:pb-24 lg:pt-16">
-          <h1 id="name" className="text-[56px] font-extrabold leading-[0.92] tracking-[-0.035em] sm:text-[84px] xl:text-[96px]">
-            Brayan
-            <br />
-            Caicedo
+      <main className="mx-auto grid w-full max-w-[1200px] gap-x-16 px-6 [grid-template-areas:'intro'_'cube'_'sides'] lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:px-10 lg:[grid-template-areas:'cube_intro'_'cube_sides']">
+        <section aria-labelledby="name" className="pb-6 pt-10 [grid-area:intro] lg:pb-20 lg:pt-24">
+          <h1 id="name" className="font-serif text-[64px] leading-[0.95] tracking-[-0.02em] sm:text-[88px] xl:text-[104px]">
+            Brayan Caicedo
           </h1>
-          <p className="mt-6 max-w-[34ch] text-[22px] font-medium leading-snug tracking-tight sm:text-[26px]">
+          <p className="mt-7 max-w-[36ch] text-[20px] leading-[1.5] text-[var(--ink)] sm:text-[22px]">
             Platform engineer. I build and run the infrastructure AI products depend on, from Kubernetes clusters to GPU fleets.
           </p>
-          <p className="mt-4 max-w-[52ch] text-base text-[var(--muted)]">
+          <p className="mt-4 max-w-[52ch] text-[15px] text-[var(--muted)]">
             Based in Canterbury, UK. Eligible for the UK Graduate visa, no sponsorship required.
           </p>
-          <div className="mt-7 flex flex-wrap items-center gap-3">
+          <div className="mt-9 flex flex-wrap items-center gap-3">
             <a
               href={CV}
               download="Brayan_Caicedo_CV.pdf"
-              className="inline-flex items-center gap-2 rounded-full bg-[#05131d] px-5 py-3 text-base font-semibold text-white transition-colors hover:bg-[#0055BF]"
+              className="inline-flex items-center gap-2 rounded-full bg-[var(--ink)] px-5 py-3 text-[15px] font-medium text-white transition-opacity hover:opacity-85"
             >
-              <Icon name="download" className="h-[18px] w-[18px]" />
+              <Icon name="download" className="h-4 w-4" />
               Download CV
             </a>
             <a
               href={`mailto:${EMAIL}`}
-              className="inline-flex items-center gap-2 rounded-full border border-[#05131d] bg-white/60 px-5 py-3 text-base font-semibold transition-colors hover:bg-white"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-[15px] font-medium ring-1 ring-[var(--line)] transition-shadow hover:ring-[var(--ink)]"
             >
-              <Icon name="mail" className="h-[18px] w-[18px]" />
+              <Icon name="mail" className="h-4 w-4" />
               Email me
             </a>
-            <a href={LINKEDIN} target="_blank" rel="noreferrer" aria-label="LinkedIn" className="rounded-full p-3 text-[var(--muted)] transition-colors hover:bg-white/70 hover:text-[var(--ink)]">
-              <Icon name="linkedin" className="h-5 w-5" />
-            </a>
-            <a href={GITHUB} target="_blank" rel="noreferrer" aria-label="GitHub" className="rounded-full p-3 text-[var(--muted)] transition-colors hover:bg-white/70 hover:text-[var(--ink)]">
-              <Icon name="github" className="h-5 w-5" />
-            </a>
+            <span className="ml-1 flex items-center gap-1">
+              <a href={LINKEDIN} target="_blank" rel="noreferrer" aria-label="LinkedIn" className="rounded-full p-2.5 text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
+                <Icon name="linkedin" className="h-[18px] w-[18px]" />
+              </a>
+              <a href={GITHUB} target="_blank" rel="noreferrer" aria-label="GitHub" className="rounded-full p-2.5 text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
+                <Icon name="github" className="h-[18px] w-[18px]" />
+              </a>
+            </span>
           </div>
-          <p className="mt-12 hidden text-[15px] text-[var(--muted)] lg:block">
-            Scroll and the cube turns with you. Each face is a different side of me.
-          </p>
         </section>
 
         <div className="[grid-area:cube] lg:sticky lg:top-0 lg:h-screen lg:self-start">
-          <div className="flex h-full flex-col items-center justify-center gap-6 pb-10 lg:pb-0">
-            <div ref={heroCubeRef} className="cube-float">
-              <Cube
-                rotateX={rotateX}
-                rotateY={rotateY}
-                activeIndex={active}
-                onSelectFace={goTo}
-                sizeClass="[--s:200px] sm:[--s:250px] lg:[--s:270px] xl:[--s:300px]"
+          <div className="relative flex h-full flex-col items-center justify-center gap-4 pb-6 lg:pb-0">
+            {/* Soft light behind the cube, in the colour of the face you're reading.
+                One layer per face, cross-faded, because gradients can't be transitioned. */}
+            {facets.map((facet, index) => (
+              <div
+                key={facet.id}
+                aria-hidden="true"
+                className="pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-[56%] transition-opacity duration-700 sm:h-[640px] sm:w-[640px]"
+                style={{
+                  opacity: index === active ? 1 : 0,
+                  background: `radial-gradient(closest-side, color-mix(in srgb, ${bricks[facet.brick].hex} ${facet.brick === "white" ? 0 : 22}%, transparent), transparent)`,
+                }}
               />
+            ))}
+            <div ref={heroCubeRef} className="cube-float relative">
+              <Cube rotateX={rotateX} rotateY={rotateY} onSelectFace={goTo} sizeClass="[--s:190px] sm:[--s:230px] lg:[--s:250px] xl:[--s:270px]" />
             </div>
-            <SidesNav active={active} onSelect={goTo} />
+            <div className="relative">
+              <SidesNav active={active} onSelect={goTo} />
+            </div>
           </div>
         </div>
 
@@ -394,40 +388,45 @@ export default function App() {
 
       <div
         aria-hidden="true"
-        className={`pointer-events-none fixed bottom-4 right-4 z-30 rounded-2xl bg-white/90 p-1 shadow-lg backdrop-blur transition-all duration-300 lg:hidden ${
-          showMini ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+        className={`pointer-events-none fixed bottom-3 right-3 z-30 drop-shadow-lg transition-all duration-500 lg:hidden ${
+          showMini ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
         }`}
       >
-        <Cube rotateX={rotateX} rotateY={rotateY} activeIndex={active} sizeClass="[--s:44px]" shadow={false} />
+        <Cube rotateX={rotateX} rotateY={rotateY} sizeClass="[--s:40px]" shadow={false} />
+      </div>
+
+      <div className="mx-auto w-full max-w-[1200px] px-6 lg:px-10">
+        <div className="border-t border-[var(--line)]" />
       </div>
 
       <WorkSection />
 
-      <footer id="contact" className="mx-auto w-full max-w-[1240px] px-6 pb-12 lg:px-10">
-        <div className="rounded-[28px] bg-[#05131d] px-6 py-12 text-white sm:px-10 lg:px-14 lg:py-16">
-          <h2 className="max-w-[22ch] text-[34px] font-bold leading-tight tracking-tight sm:text-[44px]">
+      <footer id="contact" className="mx-auto w-full max-w-[1200px] px-6 pb-14 lg:px-10">
+        <div className="border-t border-[var(--line)] pt-20 lg:pt-28">
+          <h2 className="max-w-[18ch] font-serif text-[44px] leading-[1.02] tracking-[-0.01em] sm:text-[64px]">
             Open to platform and AI infrastructure roles in the UK.
           </h2>
-          <p className="mt-4 max-w-[52ch] text-lg text-white/70">Email is the quickest way to reach me.</p>
           <a
             href={`mailto:${EMAIL}`}
-            className="mt-8 inline-block break-all text-[22px] font-semibold underline decoration-[#F2CD37] decoration-2 underline-offset-[6px] sm:text-[30px]"
+            className="mt-10 inline-block break-all text-[20px] font-medium underline decoration-[var(--line)] decoration-2 underline-offset-[8px] transition-colors hover:decoration-[var(--ink)] sm:text-[24px]"
           >
             {EMAIL}
           </a>
-          <div className="mt-10 flex flex-wrap gap-x-6 gap-y-3 text-base text-white/80">
-            <a href={LINKEDIN} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 hover:text-white">
-              <Icon name="linkedin" className="h-4 w-4" /> LinkedIn
-            </a>
-            <a href={GITHUB} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 hover:text-white">
-              <Icon name="github" className="h-4 w-4" /> GitHub
-            </a>
-            <a href={CV} download="Brayan_Caicedo_CV.pdf" className="inline-flex items-center gap-2 hover:text-white">
-              <Icon name="download" className="h-4 w-4" /> CV (PDF)
-            </a>
+          <div className="mt-16 flex flex-wrap items-center justify-between gap-6 text-sm text-[var(--muted)]">
+            <p>© {year} Brayan Caicedo</p>
+            <div className="flex flex-wrap gap-x-6 gap-y-2">
+              <a href={LINKEDIN} target="_blank" rel="noreferrer" className="transition-colors hover:text-[var(--ink)]">
+                LinkedIn
+              </a>
+              <a href={GITHUB} target="_blank" rel="noreferrer" className="transition-colors hover:text-[var(--ink)]">
+                GitHub
+              </a>
+              <a href={CV} download="Brayan_Caicedo_CV.pdf" className="transition-colors hover:text-[var(--ink)]">
+                CV (PDF)
+              </a>
+            </div>
           </div>
         </div>
-        <p className="mt-6 text-center text-sm text-[var(--muted)]">© {year} Brayan Caicedo</p>
       </footer>
 
       <HighlightDrawer modal={modal} onClose={closeModal} accent={modal?.accent} />

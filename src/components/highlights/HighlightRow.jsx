@@ -6,7 +6,7 @@ export default function HighlightRow({ highlight, onOpen, accent }) {
   const content = (
     <>
       <span className="min-w-0 flex-1">
-        <span className="font-semibold text-[var(--ink)]">{label}</span>
+        <span className="font-medium text-[var(--ink)]">{label}</span>
         {role && <span className="text-[var(--muted)]">, {role}</span>}
         <span className="mt-0.5 block text-[15px] leading-snug text-[var(--muted)]">{detail}</span>
       </span>
@@ -20,7 +20,7 @@ export default function HighlightRow({ highlight, onOpen, accent }) {
   );
 
   if (!modal) {
-    return <li className="flex items-start gap-4 border-t border-[var(--line)] py-3.5 text-base">{content}</li>;
+    return <li className="flex items-start gap-4 border-t border-[var(--line)] py-4 text-base">{content}</li>;
   }
 
   return (
@@ -28,11 +28,10 @@ export default function HighlightRow({ highlight, onOpen, accent }) {
       <button
         type="button"
         onClick={() => onOpen(modal)}
-        className="group -mx-3 flex w-[calc(100%+1.5rem)] items-center gap-4 rounded-lg px-3 py-3.5 text-left text-base transition-colors hover:bg-white/70"
+        className="group -mx-3 flex w-[calc(100%+1.5rem)] items-center gap-4 rounded-xl px-3 py-4 text-left text-base transition-colors hover:bg-white"
         style={{ "--accent": accent }}
       >
-        <span aria-hidden="true" className="h-8 w-1 shrink-0 rounded-full bg-[var(--accent)] opacity-0 transition-opacity group-hover:opacity-100" />
-        {content}
+                {content}
       </button>
     </li>
   );
