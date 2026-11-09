@@ -262,7 +262,6 @@ export const facets = [
     subtitle: "Beyond the terminal.",
     icon: "heart",
     brick: "orange",
-    photo: "/me.jpg",
     intro: "I'm from Cali, Colombia. I came to the UK for my MSc in Liverpool, and I'm now settling in Canterbury.",
     body: "Cali taught me warmth, rhythm, and how to find calm in chaos. Liverpool taught me how to build a life from scratch, far from everyone you know, in a grey city that grows on you slowly. Canterbury is the next chapter.\n\nI play volleyball three times a week. You can't fake a good set, you can't outsmart your teammates, and the score doesn't care how tired you are. It's one of the few places where I'm fully present.",
     highlights: [
