@@ -308,7 +308,6 @@ export default function App() {
           <p className="mt-9 max-w-[32ch] text-[21px] font-medium leading-[1.45]">
             Platform engineer in Canterbury, UK. I build and run the infrastructure AI products depend on, from Kubernetes clusters to GPU fleets.
           </p>
-          <p className="mt-3 text-[15px] font-semibold text-[var(--muted)]">Eligible for the UK Graduate visa, no sponsorship required.</p>
           <div className="mt-8 flex flex-wrap items-center gap-3.5">
             <a href={CV} download="Brayan_Caicedo_CV.pdf" className="box press inline-flex items-center gap-2 bg-[#FFD43B] px-5 py-3.5 font-extrabold">
               <Icon name="download" className="h-[18px] w-[18px]" />
